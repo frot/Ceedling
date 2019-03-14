@@ -63,10 +63,9 @@ class Generator
     module_name = File.basename(arg_hash[:test_file])
     test_cases  = @generator_test_runner.find_test_cases( @file_finder.find_test_from_runner_path(runner_filepath) )
     mock_list   = @test_includes_extractor.lookup_raw_mock_list(arg_hash[:test_file])
+    test_file_includes = @test_includes_extractor.lookup_local_includes_list(arg_hash[:test_file])
 
     @streaminator.stdout_puts("Generating runner for #{module_name}...", Verbosity::NORMAL)
-
-    test_file_includes = [] # Empty list for now, since apparently unused
 
     # build runner file
     begin

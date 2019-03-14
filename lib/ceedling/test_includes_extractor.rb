@@ -6,6 +6,7 @@ class TestIncludesExtractor
   def setup
     @includes  = {}
     @mocks     = {}
+    @local     = {}
   end
 
 
@@ -24,6 +25,13 @@ class TestIncludesExtractor
     file_key = form_file_key(test)
     return [] if @mocks[file_key].nil?
     return @mocks[file_key]
+  end
+
+  # local includes with file extension, excludes mocks
+  def lookup_local_includes_list(file)
+    file_key = form_file_key(file)
+    return [] if (@local[file_key]).nil?
+    return @local[file_key]
   end
 
   # includes with file extension
@@ -70,6 +78,7 @@ class TestIncludesExtractor
     header_extension = @configurator.extension_header
     file_key         = form_file_key(file)
     @mocks[file_key] = []
+    @local[file_key] = []
 
     # add includes to lookup hash
     @includes[file_key] = includes
@@ -78,7 +87,11 @@ class TestIncludesExtractor
       # check if include is a mock
       scan_results = include_file.scan(/(#{mock_prefix}.+)#{'\\'+header_extension}/)
       # add mock to lookup hash
-      @mocks[file_key] << scan_results[0][0] if (scan_results.size > 0)
+      if (scan_results.size > 0)
+        @mocks[file_key] << scan_results[0][0]
+      elsif not include_file =~ %r{/_}
+        @local[file_key] << include_file
+      end
     end
   end
 
